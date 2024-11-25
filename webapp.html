@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intuition for Publication Bias</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Full viewport height */
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        h1 {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.5rem;
+        }
+
+        #slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        input[type="range"] {
+            width: 80%;
+            max-width: 400px;
+        }
+
+        label {
+            font-size: 1rem;
+        }
+
+        #plot {
+            width: 90%;
+            height: calc(85vh); /* Ensure the plot dynamically fits */
+        }
+    </style>
+</head>
+<body>
+    <h1>Intuition for Publication Bias</h1>
+    <div id="slider-container">
+        <label for="s2-slider">% of unpublished null/ not significant/negative effects: <span id="s2-value">0</span></label>
+        <input type="range" id="s2-slider" min="0" max="1" step="0.01" value="0">
+    </div>
+    <div id="plot"></div>
+    <script type="text/javascript">
+        async function main() {
+            const pyodide = await loadPyodide();
+
+            const plotDiv = document.getElementById("plot");
+            const slider = document.getElementById("s2-slider");
+            const s2Value = document.getElementById("s2-value");
+
+            await pyodide.loadPackage("micropip");
+            const micropip = pyodide.pyimport("micropip");
+            await micropip.install("pandas");
+            await micropip.install("numpy");
+            await micropip.install("plotly");
+
+            async function updatePlot(s2) {
+                const pythonCode = `
+import numpy as np
+import plotly.graph_objects as go
+import plotly.subplots as sp
+import json
+
+# Function to recursively convert NumPy arrays to lists in a dictionary
+def numpy_to_list(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: numpy_to_list(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [numpy_to_list(item) for item in obj]
+    else:
+        return obj
+
+# Function to generate Plotly subplots
+def plot_bias(s2):
+    s = 1 - s2
+
+    # Colors
+    dark_blue = "#1f77b4"
+    dark_orange = "#ff7f0e"
+
+    # Gaussian Data
+    x1 = np.linspace(-3, 3, 500)
+    y1 = np.exp(-0.5 * x1**2) / np.sqrt(2 * np.pi)
+
+    x2 = np.linspace(-3, 3, 500)
+    y2 = np.exp(-0.5 * x2**2)
+    y2[x2 < 2] *= s
+    y2 /= np.trapz(y2, x2)
+
+    # Bar Plot Data
+    bar_x = ["p<0.05, neg", "NS, neg", "NS, pos", "p<0.05, pos"]
+    bar_y1 = [0.025, 0.475, 0.475, 0.025]
+    bar_y2 = bar_y1[:]
+    bar_y2[:3] = [val * s for val in bar_y1[:3]]
+    bar_y2 = [val / sum(bar_y2) for val in bar_y2]
+
+    # Create Subplots
+    fig = sp.make_subplots(rows=4, cols=1, shared_xaxes=False, vertical_spacing=0.1,
+                           subplot_titles=("Distribution of Real Effects",
+                                           "Distribution of Published Papers",
+                                           "Significance of Experiments",
+                                           "Significance of Published Papers"))
+
+    # Add Gaussian Plot (1)
+    fig.add_trace(go.Scatter(x=x1, y=y1, mode='lines', line=dict(color=dark_blue), name="Real Effects"), row=1, col=1)
+
+    # Add Modified Gaussian Plot (2)
+    fig.add_trace(go.Scatter(x=x2, y=y2, mode='lines', line=dict(color=dark_orange), name="Published Papers"), row=2, col=1)
+
+    # Add Bar Plot (3)
+    fig.add_trace(go.Bar(x=bar_x, y=bar_y1, marker_color=dark_blue, name="Significance of Experiments"), row=3, col=1)
+
+    # Add Scaled Bar Plot (4)
+    fig.add_trace(go.Bar(x=bar_x, y=bar_y2, marker_color=dark_orange, name="Significance of Published Papers"), row=4, col=1)
+
+    # Update Layout
+    fig.update_layout(
+        height=800,
+        margin=dict(t=100, b=50, l=50, r=50),
+        title_x=0.5,
+        showlegend=False
+    )
+
+    # Update Axis Labels
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=1, col=1)
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=2, col=1)
+
+    # Convert Plotly figure to dictionary and ensure NumPy arrays are converted to lists
+    fig_dict = fig.to_dict()
+    clean_fig_dict = numpy_to_list(fig_dict)
+
+    # Serialize the cleaned dictionary to JSON
+    return json.dumps(clean_fig_dict)
+
+plot_bias(${s2})
+                `;
+                try {
+                    const plotJSON = await pyodide.runPythonAsync(pythonCode);
+
+                    // Parse JSON from Python output
+                    const plotData = JSON.parse(plotJSON);
+
+                    // Clear existing plot (if any)
+                    plotDiv.innerHTML = "";
+
+                    // Render the Plotly plot
+                    Plotly.newPlot(plotDiv, plotData.data, plotData.layout, { responsive: true });
+                } catch (error) {
+                    console.error("Error generating Plotly plot:", error);
+                    plotDiv.innerHTML = "<p style='color:red;'>Error generating plot. Check console for details.</p>";
+                }
+            }
+
+            slider.addEventListener("input", async () => {
+                const s2 = slider.value;
+                s2Value.textContent = s2;
+                await updatePlot(s2);
+            });
+
+            await updatePlot(slider.value);
+        }
+
+        main();
+    </script>
+</body>
+</html>
+
