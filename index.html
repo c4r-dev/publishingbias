@@ -86,6 +86,12 @@
             #slider-container {
                 margin-bottom: 15px;
             }
+
+            .plotly .annotation {
+                font-size: 10px !important; /* Adjust font size for subplot titles */
+                white-space: normal; /* Ensure titles wrap */
+                word-wrap: break-word;
+            }
         }
     </style>
 </head>
@@ -185,27 +191,10 @@ def plot_bias(s2):
         margin=dict(t=100, b=50, l=50, r=50),
         title_x=0.5,
         showlegend=False,
-        xaxis=dict(title=dict(standoff=10)),  # Reduced standoff for first plot
-        xaxis2=dict(title=dict(standoff=10)),  # Reduced standoff for second plot
+        font=dict(size=12),
     )
 
-    # Add average Z-score annotations to the first two plots
-    fig.add_annotation(
-        x=2.5, y=max(y1) * 0.8, xref="x1", yref="y1",
-        text=f"Avg Z: {avg_z1:.2f}",
-        showarrow=False,
-        font=dict(size=12, color="red")
-    )
-    fig.add_annotation(
-        x=2.5, y=max(y2) * 0.8, xref="x2", yref="y2",
-        text=f"Avg Z: {avg_z2:.2f}",
-        showarrow=False,
-        font=dict(size=12, color="red")
-    )
-
-    fig.update_xaxes(title_text="Z-score (mean/std)", row=1, col=1)
-    fig.update_xaxes(title_text="Z-score (mean/std)", row=2, col=1)
-
+    fig.update_annotations(font=dict(size=10))  # Reduced font size for titles
     fig_dict = fig.to_dict()
     clean_fig_dict = numpy_to_list(fig_dict)
 
