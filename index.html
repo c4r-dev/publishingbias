@@ -9,13 +9,22 @@
     <style>
         body {
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow-x: hidden;
             font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 900px; /* Maximum width for the layout */
+            width: 100%; /* Ensures it scales on smaller screens */
+            margin: 0 auto; /* Centers the layout horizontally */
+            padding: 20px; /* Adds some space around the content */
+            background: #fff; /* White background for the container */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            border-radius: 8px; /* Rounded corners */
         }
 
         h1 {
@@ -28,13 +37,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 10px;
-            width: 90%; /* Ensure container adapts to screen size */
+            margin-bottom: 20px;
+            width: 100%;
         }
 
         input[type="range"] {
             width: 100%;
-            max-width: 500px; /* Allow flexibility for larger screens */
+            max-width: 500px; /* Limits the width of the slider */
         }
 
         label {
@@ -43,38 +52,66 @@
         }
 
         #plot {
-            width: 95%; /* Take full width on smaller screens */
-            height: 70vh; /* Adjusted height for better mobile fit */
-            max-height: 700px; /* Limit max height for very large screens */
+            width: 100%; /* Plot takes full width of the container */
+            height: 70vh; /* Fixed height for better layout */
+            max-height: 700px; /* Limits the height on larger screens */
+        }
+
+        #loading {
+            font-size: 1.5rem;
+            color: #333;
+            display: none; /* Initially hidden */
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
             #plot {
-                height: 60vh; /* Slightly smaller height on small devices */
+                height: 60vh; /* Slightly smaller height for small screens */
+            }
+
+            #slider-container {
+                margin-bottom: 15px;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Intuition for Publication Bias</h1>
-    <div id="slider-container">
-        <label for="s2-slider">% of unpublished null/ not significant/negative effects: <span id="s2-value">0</span></label>
-        <input type="range" id="s2-slider" min="0" max="1" step="0.01" value="0">
+    <div class="container">
+        <h1>Intuition for Publication Bias</h1>
+        <p id="loading">Loading Python libraries, please wait...</p> <!-- Loading message -->
+        <div id="slider-container">
+            <label for="s2-slider">% of unpublished null/ not significant/negative effects: <span id="s2-value">0</span></label>
+            <input type="range" id="s2-slider" min="0" max="1" step="0.01" value="0">
+        </div>
+        <div id="plot"></div>
     </div>
-    <div id="plot"></div>
     <script type="text/javascript">
         async function main() {
-            const pyodide = await loadPyodide();
-
+            const loadingMessage = document.getElementById("loading");
             const plotDiv = document.getElementById("plot");
             const slider = document.getElementById("s2-slider");
             const s2Value = document.getElementById("s2-value");
 
+            // Show loading message
+            loadingMessage.style.display = "block";
+
+            const pyodide = await loadPyodide();
+
             await pyodide.loadPackage("micropip");
             const micropip = pyodide.pyimport("micropip");
+
+            // Install required Python libraries
             await micropip.install("pandas");
             await micropip.install("numpy");
             await micropip.install("plotly");
+
+            // Hide loading message after libraries are loaded
+            loadingMessage.style.display = "none";
 
             async function updatePlot(s2) {
                 const pythonCode = `
