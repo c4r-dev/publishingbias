@@ -183,10 +183,10 @@ def plot_bias(s2):
     fig.add_trace(go.Bar(x=bar_x, y=bar_y1, marker_color=dark_blue, name="Significance of Experiments"), row=3, col=1)
     fig.add_trace(go.Bar(x=bar_x, y=bar_y2, marker_color=dark_orange, name="Significance of Published Papers"), row=4, col=1)
 
-    fig.update_xaxes(title_text="Z-score (mean/std)", row=1, col=1, title_standoff=15, tickfont=dict(size=8))
-    fig.update_xaxes(title_text="Z-score (mean/std)", row=2, col=1, title_standoff=15, tickfont=dict(size=8))
-    fig.update_xaxes(title_text="Significance Categories", row=3, col=1, title_standoff=15, tickfont=dict(size=8))
-    fig.update_xaxes(title_text="Significance Categories", row=4, col=1, title_standoff=15, tickfont=dict(size=8))
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=1, col=1, title_standoff=15, tickfont=dict(size=10))
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=2, col=1, title_standoff=15, tickfont=dict(size=10))
+    fig.update_xaxes(title_text="Significance Categories", row=3, col=1, title_standoff=15, tickfont=dict(size=10))
+    fig.update_xaxes(title_text="Significance Categories", row=4, col=1, title_standoff=15, tickfont=dict(size=10))
 
     fig.update_layout(
         height=900,
