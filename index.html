@@ -151,13 +151,13 @@ def plot_bias(s2):
 
     x1 = np.linspace(-3, 3, 500)
     y1 = np.exp(-0.5 * x1**2) / np.sqrt(2 * np.pi)
-    avg_z1 = 0
+    avg_z1 = 0  # Average Z-score for real effects
 
     x2 = np.linspace(-3, 3, 500)
     y2 = np.exp(-0.5 * x2**2)
     y2[x2 < 2] *= s
     y2 /= np.trapz(y2, x2)
-    avg_z2 = np.trapz(x2 * y2, x2)
+    avg_z2 = np.trapz(x2 * y2, x2)  # Average Z-score for published papers
 
     bar_x = ["p<0.05, neg", "NS, neg", "NS, pos", "p<0.05, pos"]
     bar_y1 = [0.025, 0.475, 0.475, 0.025]
@@ -178,11 +178,13 @@ def plot_bias(s2):
         )
     )
 
+    # Add plots
     fig.add_trace(go.Scatter(x=x1, y=y1, mode='lines', line=dict(color=dark_blue), name="Real Effects"), row=1, col=1)
     fig.add_trace(go.Scatter(x=x2, y=y2, mode='lines', line=dict(color=dark_orange), name="Published Papers"), row=2, col=1)
     fig.add_trace(go.Bar(x=bar_x, y=bar_y1, marker_color=dark_blue, name="Significance of Experiments"), row=3, col=1)
     fig.add_trace(go.Bar(x=bar_x, y=bar_y2, marker_color=dark_orange, name="Significance of Published Papers"), row=4, col=1)
 
+    # Update axes
     fig.update_xaxes(
         title_text="Z-score (mean/std)", 
         row=1, 
@@ -216,6 +218,23 @@ def plot_bias(s2):
         title_font=dict(size=10)
     )
 
+    # Add annotations for Z-score averages (with red font color)
+    fig.add_annotation(
+        x=2.5, y=max(y1),  # Position on the first plot
+        text=f"Average Z: {avg_z1:.2f}",
+        showarrow=False,
+        font=dict(size=10, color="red"),  # Red font for the annotation
+        xref="x1", yref="y1",
+    )
+    fig.add_annotation(
+        x=2.5, y=max(y2),  # Position on the second plot
+        text=f"Average Z: {avg_z2:.2f}",
+        showarrow=False,
+        font=dict(size=10, color="red"),  # Red font for the annotation
+        xref="x2", yref="y2",
+    )
+
+    # Update layout
     fig.update_layout(
         height=900,
         margin=dict(t=100, b=50, l=50, r=50),
