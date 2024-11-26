@@ -14,17 +14,19 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow-y: auto; /* Always allow vertical scrolling */
             background-color: #f9f9f9;
         }
 
         .container {
             max-width: 900px; /* Maximum width for the layout */
             width: 100%; /* Ensures it scales on smaller screens */
-            margin: 0 auto; /* Centers the layout horizontally */
+            margin: 20px auto; /* Centers the layout horizontally and adds vertical space */
             padding: 20px; /* Adds some space around the content */
             background: #fff; /* White background for the container */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
             border-radius: 8px; /* Rounded corners */
+            min-height: 100%; /* Ensure content isn't clipped */
         }
 
         h1 {
