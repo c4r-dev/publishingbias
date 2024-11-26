@@ -35,6 +35,13 @@
             font-size: calc(1.5rem + 1vw); /* Responsive font size */
         }
 
+        h2 {
+            text-align: center;
+            font-size: calc(1rem + 0.5vw);
+            color: #666;
+            margin: 0 0 20px;
+        }
+
         #slider-container {
             display: flex;
             flex-direction: column;
@@ -85,6 +92,7 @@
 <body>
     <div class="container">
         <h1>Intuition for Publication Bias</h1>
+        <h2>[assuming there is no effect]</h2>
         <p id="loading">Loading Python libraries, please wait...</p> <!-- Loading message -->
         <div id="slider-container">
             <label for="s2-slider">% of unpublished null/ not significant/negative effects: <span id="s2-value">0</span></label>
@@ -160,10 +168,10 @@ def plot_bias(s2):
         shared_xaxes=False,
         vertical_spacing=0.25,  # Increased spacing between plots
         subplot_titles=(
-            "Distribution of Real Effects",
-            "Distribution of Published Papers",
-            "Significance of Experiments",
-            "Significance of Published Papers"
+            "Distribution of Measured Effect",
+            "Distribution of Measured Effect in Published Papers",
+            "Significance",
+            "Significance in Published Papers"
         )
     )
 
