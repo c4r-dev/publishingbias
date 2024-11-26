@@ -88,7 +88,7 @@
             }
 
             .plotly .annotation {
-                font-size: 14px !important; /* Larger font size for subplot titles on smaller screens */
+                font-size: 12px !important; /* Adjust subplot title font size for small screens */
                 white-space: normal; /* Ensure titles wrap */
                 word-wrap: break-word;
             }
@@ -200,6 +200,7 @@ def plot_bias(s2):
         font=dict(size=14),
     )
 
+    fig.update_annotations(font=dict(size=12))  # Reduced font size for titles
     fig_dict = fig.to_dict()
     clean_fig_dict = numpy_to_list(fig_dict)
 
