@@ -186,15 +186,20 @@ def plot_bias(s2):
     fig.add_trace(go.Bar(x=bar_x, y=bar_y1, marker_color=dark_blue, name="Significance of Experiments"), row=3, col=1)
     fig.add_trace(go.Bar(x=bar_x, y=bar_y2, marker_color=dark_orange, name="Significance of Published Papers"), row=4, col=1)
 
+    # Add x-axis labels explicitly
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=1, col=1, title_standoff=15)
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=2, col=1, title_standoff=15)
+    fig.update_xaxes(title_text="Significance Categories", row=3, col=1, title_standoff=15)
+    fig.update_xaxes(title_text="Significance Categories", row=4, col=1, title_standoff=15)
+
     fig.update_layout(
         height=900,
         margin=dict(t=100, b=50, l=50, r=50),
         title_x=0.5,
         showlegend=False,
-        font=dict(size=14),  # Larger font for titles
+        font=dict(size=14),
     )
 
-    fig.update_annotations(font=dict(size=16))  # Increased font size for subplot titles
     fig_dict = fig.to_dict()
     clean_fig_dict = numpy_to_list(fig_dict)
 
