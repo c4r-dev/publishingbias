@@ -14,25 +14,25 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-y: auto; /* Always allow vertical scrolling */
+            overflow-y: auto;
             background-color: #f9f9f9;
         }
 
         .container {
-            max-width: 900px; /* Maximum width for the layout */
-            width: 100%; /* Ensures it scales on smaller screens */
-            margin: 20px auto; /* Centers the layout horizontally and adds vertical space */
-            padding: 20px; /* Adds some space around the content */
-            background: #fff; /* White background for the container */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            border-radius: 8px; /* Rounded corners */
-            min-height: 100%; /* Ensure content isn't clipped */
+            max-width: 900px;
+            width: 100%;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            min-height: 100%;
         }
 
         h1 {
             text-align: center;
             margin: 10px 0;
-            font-size: calc(1.5rem + 1vw); /* Responsive font size */
+            font-size: calc(1.5rem + 1vw);
         }
 
         h2 {
@@ -52,24 +52,24 @@
 
         input[type="range"] {
             width: 100%;
-            max-width: 500px; /* Limits the width of the slider */
+            max-width: 500px;
         }
 
         label {
-            font-size: calc(1rem + 0.3vw); /* Responsive font size */
+            font-size: calc(1rem + 0.3vw);
             text-align: center;
         }
 
         #plot {
-            width: 100%; /* Plot takes full width of the container */
-            height: 70vh; /* Fixed height for better layout */
-            max-height: 700px; /* Limits the height on larger screens */
+            width: 100%;
+            height: 70vh;
+            max-height: 700px;
         }
 
         #loading {
             font-size: 1.5rem;
             color: #333;
-            display: none; /* Initially hidden */
+            display: none;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -80,7 +80,7 @@
             }
 
             #plot {
-                height: 60vh; /* Slightly smaller height for small screens */
+                height: 60vh;
             }
 
             #slider-container {
@@ -88,8 +88,8 @@
             }
 
             .plotly .annotation {
-                font-size: 12px !important; /* Adjust subplot title font size for small screens */
-                white-space: normal; /* Ensure titles wrap */
+                font-size: 12px !important;
+                white-space: normal;
                 word-wrap: break-word;
             }
         }
@@ -99,7 +99,7 @@
     <div class="container">
         <h1>Intuition for Publication Bias</h1>
         <h2>[assuming there is no effect]</h2>
-        <p id="loading">Loading Python libraries, please wait...</p> <!-- Loading message -->
+        <p id="loading">Loading Python libraries, please wait...</p>
         <div id="slider-container">
             <label for="s2-slider">% of unpublished null/ not significant/negative effects: <span id="s2-value">0</span></label>
             <input type="range" id="s2-slider" min="0" max="1" step="0.01" value="0">
@@ -113,7 +113,6 @@
             const slider = document.getElementById("s2-slider");
             const s2Value = document.getElementById("s2-value");
 
-            // Show loading message
             loadingMessage.style.display = "block";
 
             const pyodide = await loadPyodide();
@@ -121,12 +120,10 @@
             await pyodide.loadPackage("micropip");
             const micropip = pyodide.pyimport("micropip");
 
-            // Install required Python libraries
             await micropip.install("pandas");
             await micropip.install("numpy");
             await micropip.install("plotly");
 
-            // Hide loading message after libraries are loaded
             loadingMessage.style.display = "none";
 
             async function updatePlot(s2) {
@@ -154,7 +151,7 @@ def plot_bias(s2):
 
     x1 = np.linspace(-3, 3, 500)
     y1 = np.exp(-0.5 * x1**2) / np.sqrt(2 * np.pi)
-    avg_z1 = 0  # Mean of a standard normal distribution is 0
+    avg_z1 = 0
 
     x2 = np.linspace(-3, 3, 500)
     y2 = np.exp(-0.5 * x2**2)
@@ -172,7 +169,7 @@ def plot_bias(s2):
         rows=4,
         cols=1,
         shared_xaxes=False,
-        vertical_spacing=0.25,  # Increased spacing between plots
+        vertical_spacing=0.25,
         subplot_titles=(
             "Distribution of Measured Effect",
             "Distribution of Measured Effect in Published Papers",
@@ -186,11 +183,10 @@ def plot_bias(s2):
     fig.add_trace(go.Bar(x=bar_x, y=bar_y1, marker_color=dark_blue, name="Significance of Experiments"), row=3, col=1)
     fig.add_trace(go.Bar(x=bar_x, y=bar_y2, marker_color=dark_orange, name="Significance of Published Papers"), row=4, col=1)
 
-    # Add x-axis labels explicitly
-    fig.update_xaxes(title_text="Z-score (mean/std)", row=1, col=1, title_standoff=15)
-    fig.update_xaxes(title_text="Z-score (mean/std)", row=2, col=1, title_standoff=15)
-    fig.update_xaxes(title_text="Significance Categories", row=3, col=1, title_standoff=15)
-    fig.update_xaxes(title_text="Significance Categories", row=4, col=1, title_standoff=15)
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=1, col=1, title_standoff=15, tickfont=dict(size=8))
+    fig.update_xaxes(title_text="Z-score (mean/std)", row=2, col=1, title_standoff=15, tickfont=dict(size=8))
+    fig.update_xaxes(title_text="Significance Categories", row=3, col=1, title_standoff=15, tickfont=dict(size=8))
+    fig.update_xaxes(title_text="Significance Categories", row=4, col=1, title_standoff=15, tickfont=dict(size=8))
 
     fig.update_layout(
         height=900,
@@ -200,7 +196,7 @@ def plot_bias(s2):
         font=dict(size=14),
     )
 
-    fig.update_annotations(font=dict(size=12))  # Reduced font size for titles
+    fig.update_annotations(font=dict(size=12))
     fig_dict = fig.to_dict()
     clean_fig_dict = numpy_to_list(fig_dict)
 
