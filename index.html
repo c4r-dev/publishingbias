@@ -119,7 +119,7 @@ def plot_bias(s2):
         rows=4,
         cols=1,
         shared_xaxes=False,
-        vertical_spacing=0.2,  # Increased spacing between plots
+        vertical_spacing=0.25,  # Increased spacing between plots
         subplot_titles=(
             "Distribution of Real Effects",
             "Distribution of Published Papers",
@@ -134,10 +134,12 @@ def plot_bias(s2):
     fig.add_trace(go.Bar(x=bar_x, y=bar_y2, marker_color=dark_orange, name="Significance of Published Papers"), row=4, col=1)
 
     fig.update_layout(
-        height=800,
+        height=900,
         margin=dict(t=100, b=50, l=50, r=50),
         title_x=0.5,
         showlegend=False,
+        xaxis=dict(title=dict(standoff=20)),  # Add spacing for x-axis title
+        xaxis2=dict(title=dict(standoff=20)),  # Add spacing for x-axis title
     )
 
     # Add average Z-score annotations to the first two plots
